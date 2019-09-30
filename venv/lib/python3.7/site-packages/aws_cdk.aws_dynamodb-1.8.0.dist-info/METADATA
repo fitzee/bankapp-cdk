@@ -1,0 +1,97 @@
+Metadata-Version: 2.1
+Name: aws-cdk.aws-dynamodb
+Version: 1.8.0
+Summary: CDK Constructs for AWS DynamoDB
+Home-page: https://github.com/aws/aws-cdk
+Author: Amazon Web Services
+License: UNKNOWN
+Project-URL: Source, https://github.com/aws/aws-cdk.git
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: jsii (~=0.16.0)
+Requires-Dist: publication (>=0.0.3)
+Requires-Dist: aws-cdk.aws-applicationautoscaling (>=1.8.0,~=1.8)
+Requires-Dist: aws-cdk.aws-iam (>=1.8.0,~=1.8)
+Requires-Dist: aws-cdk.core (>=1.8.0,~=1.8)
+
+## Amazon DynamoDB Construct Library
+<!--BEGIN STABILITY BANNER-->
+
+---
+
+![Stability: Stable](https://img.shields.io/badge/stability-Stable-success.svg?style=for-the-badge)
+
+
+---
+<!--END STABILITY BANNER-->
+
+Here is a minimal deployable DynamoDB table definition:
+
+```ts
+import dynamodb = require('@aws-cdk/aws-dynamodb');
+
+const table = new dynamodb.Table(this, 'Table', {
+  partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING }
+});
+```
+
+### Keys
+
+When a table is defined, you must define it's schema using the `partitionKey`
+(required) and `sortKey` (optional) properties.
+
+### Billing Mode
+
+DynamoDB supports two billing modes:
+* PROVISIONED - the default mode where the table and global secondary indexes have configured read and write capacity.
+* PAY_PER_REQUEST - on-demand pricing and scaling. You only pay for what you use and there is no read and write capacity for the table or its global secondary indexes.
+
+```ts
+import dynamodb = require('@aws-cdk/aws-dynamodb');
+
+const table = new dynamodb.Table(this, 'Table', {
+  partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
+  billingMode: dynamodb.BillingMode.PAY_PER_REQUEST
+});
+```
+
+Further reading:
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadWriteCapacityMode.
+
+### Configure AutoScaling for your table
+
+You can have DynamoDB automatically raise and lower the read and write capacities
+of your table by setting up autoscaling. You can use this to either keep your
+tables at a desired utilization level, or by scaling up and down at preconfigured
+times of the day:
+
+Auto-scaling is only relevant for tables with the billing mode, PROVISIONED.
+
+```ts
+const readScaling = table.autoScaleReadCapacity({ minCapacity: 1, maxCapacity: 50 });
+
+readScaling.scaleOnUtilization({
+  targetUtilizationPercent: 50
+});
+
+readScaling.scaleOnSchedule('ScaleUpInTheMorning', {
+  schedule: appscaling.Schedule.cron({ hour: '8', minute: '0' }),
+  minCapacity: 20,
+});
+
+readScaling.scaleOnSchedule('ScaleDownAtNight', {
+  schedule: appscaling.Schedule.cron({ hour: '20', minute: '0' }),
+  maxCapacity: 20
+});
+```
+
+Further reading:
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/AutoScaling.html
+https://aws.amazon.com/blogs/database/how-to-use-aws-cloudformation-to-configure-auto-scaling-for-amazon-dynamodb-tables-and-indexes/
+
+### Amazon DynamoDB Global Tables
+Please see the `@aws-cdk/aws-dynamodb-global` package.
+
+
+

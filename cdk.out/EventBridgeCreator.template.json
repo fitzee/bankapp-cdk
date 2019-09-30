@@ -1,0 +1,225 @@
+{
+  "Resources": {
+    "eventbridgeEventBridgeCustomRoleC19E1296": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEventBridgeFullAccess"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/CloudWatchLogsFullAccess"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "EventBridgeCreator/eventbridge/EventBridgeCustomRole/Resource"
+      }
+    },
+    "eventbridge99BC66D6": {
+      "Type": "AWS::CloudFormation::CustomResource",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "SingletonLambda2bdf7084233d42c18e331dc6bd2716caF6724BE2",
+            "Arn"
+          ]
+        },
+        "Name": "banking-demo-eventsprod",
+        "Rules": [
+          {
+            "name": "APPLICATION_SUBMITTED",
+            "state": "ENABLED",
+            "pattern": "{ \"detail-type\": [\"APPLICATION_SUBMITTED\"] }"
+          },
+          {
+            "name": "APPLICATION_APPROVED",
+            "state": "ENABLED",
+            "pattern": "{ \"detail-type\": [\"APPLICATION_APPROVED\"] }"
+          }
+        ],
+        "Targets": [
+          {
+            "rule": "APPLICATION_APPROVED",
+            "arns": [
+              {
+                "Fn::ImportValue": "BankAccountService-prod:ExportsOutputFnGetAttBankAccountServiceprodbankaccounts76420514Arn79288BEF"
+              }
+            ]
+          }
+        ]
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "EventBridgeCreator/eventbridge/Resource/Default"
+      }
+    },
+    "SingletonLambda2bdf7084233d42c18e331dc6bd2716caF6724BE2": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeS3Bucket8F326378"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeS3VersionKeyAD2833A6"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeS3VersionKeyAD2833A6"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "eventbridge-handler.main",
+        "Role": {
+          "Fn::GetAtt": [
+            "eventbridgeEventBridgeCustomRoleC19E1296",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Timeout": 300
+      },
+      "DependsOn": [
+        "eventbridgeEventBridgeCustomRoleC19E1296"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "EventBridgeCreator/SingletonLambda2bdf7084233d42c18e331dc6bd2716ca/Resource",
+        "aws:asset:path": "asset.02d71d120b94ac3b272771f79e4eca08519ce656f9a44ddef070c67551912c4e",
+        "aws:asset:property": "Code"
+      }
+    },
+    "EventBridgebankingdemoeventsprodB04D0B6E": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "EventBridgeCreator/EventBridge_banking-demo-eventsprod/Resource"
+      }
+    },
+    "EventBridgebankingdemoeventsprodDefaultPolicy233DAAF6": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "eventbridge99BC66D6",
+                  "EventBusArn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "EventBridgebankingdemoeventsprodDefaultPolicy233DAAF6",
+        "Roles": [
+          {
+            "Ref": "EventBridgebankingdemoeventsprodB04D0B6E"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "EventBridgeCreator/EventBridge_banking-demo-eventsprod/DefaultPolicy/Resource"
+      }
+    }
+  },
+  "Parameters": {
+    "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeS3Bucket8F326378": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"EventBridgeCreator/SingletonLambda2bdf7084233d42c18e331dc6bd2716ca/Code\""
+    },
+    "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeS3VersionKeyAD2833A6": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"EventBridgeCreator/SingletonLambda2bdf7084233d42c18e331dc6bd2716ca/Code\""
+    },
+    "SingletonLambda2bdf7084233d42c18e331dc6bd2716caCodeArtifactHash036EF380": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"EventBridgeCreator/SingletonLambda2bdf7084233d42c18e331dc6bd2716ca/Code\""
+    }
+  },
+  "Outputs": {
+    "ExportsOutputFnGetAtteventbridge99BC66D6EventBusArnF88DED97": {
+      "Value": {
+        "Fn::GetAtt": [
+          "eventbridge99BC66D6",
+          "EventBusArn"
+        ]
+      },
+      "Export": {
+        "Name": "EventBridgeCreator:ExportsOutputFnGetAtteventbridge99BC66D6EventBusArnF88DED97"
+      }
+    }
+  }
+}

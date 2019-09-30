@@ -1,0 +1,40 @@
+Metadata-Version: 2.1
+Name: aws-cdk.aws-autoscaling-common
+Version: 1.8.0
+Summary: Common implementation package for @aws-cdk/aws-autoscaling and @aws-cdk/aws-applicationautoscaling
+Home-page: https://github.com/aws/aws-cdk
+Author: Amazon Web Services
+License: UNKNOWN
+Project-URL: Source, https://github.com/aws/aws-cdk.git
+Platform: UNKNOWN
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: jsii (~=0.16.0)
+Requires-Dist: publication (>=0.0.3)
+Requires-Dist: aws-cdk.aws-iam (>=1.8.0,~=1.8)
+Requires-Dist: aws-cdk.core (>=1.8.0,~=1.8)
+
+## AWS AutoScaling Common Library
+<!--BEGIN STABILITY BANNER-->
+
+---
+
+![Stability: Experimental](https://img.shields.io/badge/stability-Experimental-important.svg?style=for-the-badge)
+
+> **This is a _developer preview_ (public beta) module. Releases might lack important features and might have
+> future breaking changes.**
+>
+> This API is still under active development and subject to non-backward
+> compatible changes or removal in any future version. Use of the API is not recommended in production
+> environments. Experimental APIs are not subject to the Semantic Versioning model.
+
+---
+<!--END STABILITY BANNER-->
+
+This is a sister package to `@aws-cdk/aws-autoscaling` and
+`@aws-cdk/aws-applicationautoscaling`. It contains shared implementation
+details between them.
+
+It does not need to be used directly.
+
+

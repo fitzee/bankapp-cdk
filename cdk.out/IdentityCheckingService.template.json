@@ -1,0 +1,140 @@
+{
+  "Resources": {
+    "IdentityCheckingServiceprodServiceRole955D6714": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "IdentityCheckingService/IdentityCheckingService-prod/ServiceRole/Resource"
+      }
+    },
+    "IdentityCheckingServiceprod67BBEF11": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "IdentityCheckingServiceprodCodeS3BucketE45C4D8A"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "IdentityCheckingServiceprodCodeS3VersionKey40F8F8A2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "IdentityCheckingServiceprodCodeS3VersionKey40F8F8A2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "main.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "IdentityCheckingServiceprodServiceRole955D6714",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x"
+      },
+      "DependsOn": [
+        "IdentityCheckingServiceprodServiceRole955D6714"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "IdentityCheckingService/IdentityCheckingService-prod/Resource",
+        "aws:asset:path": "asset.226b7a3350b476f13da97e48cf2163621f425e8accc539c178a5714817237074",
+        "aws:asset:property": "Code"
+      }
+    },
+    "ServiceEndpointSSM": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Type": "String",
+        "Value": {
+          "Fn::GetAtt": [
+            "IdentityCheckingServiceprod67BBEF11",
+            "Arn"
+          ]
+        },
+        "Name": "ServiceEndpointSSM"
+      },
+      "Metadata": {
+        "aws:cdk:path": "IdentityCheckingService/ServiceEndpointSSM"
+      }
+    }
+  },
+  "Parameters": {
+    "IdentityCheckingServiceprodCodeS3BucketE45C4D8A": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"IdentityCheckingService/IdentityCheckingService-prod/Code\""
+    },
+    "IdentityCheckingServiceprodCodeS3VersionKey40F8F8A2": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"IdentityCheckingService/IdentityCheckingService-prod/Code\""
+    },
+    "IdentityCheckingServiceprodCodeArtifactHash75DF58C4": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"IdentityCheckingService/IdentityCheckingService-prod/Code\""
+    }
+  },
+  "Outputs": {
+    "ExportsOutputFnGetAttIdentityCheckingServiceprod67BBEF11ArnC8E7F17B": {
+      "Value": {
+        "Fn::GetAtt": [
+          "IdentityCheckingServiceprod67BBEF11",
+          "Arn"
+        ]
+      },
+      "Export": {
+        "Name": "IdentityCheckingService:ExportsOutputFnGetAttIdentityCheckingServiceprod67BBEF11ArnC8E7F17B"
+      }
+    }
+  }
+}
