@@ -1,5 +1,7 @@
 boto3
 aws_cdk.core
+aws_cdk.aws_events
+aws_cdk.aws_events_targets
 aws_cdk.aws_cloudformation
 aws_cdk.aws_dynamodb
 aws_cdk.aws_lambda

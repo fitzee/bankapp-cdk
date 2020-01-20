@@ -1,5 +1,6 @@
-from aws_cdk import (aws_iam as iam, aws_lambda as lambda_ , core)
-from eventbridge_custom import aws_eventbridge as eb
+from aws_cdk import (aws_iam as iam, aws_lambda as lambda_ , aws_events as events,
+                     aws_events_targets as targets, core)
+
 from typing import Optional
 
 
@@ -10,20 +11,17 @@ class EventBridgeCreatorStack(core.Stack):
         super().__init__(scope, id+'-'+stage, **kwargs)
 
         bus_name = 'banking-demo-events-'+stage
-        bus = eb.event_bus(self, 'eventbridge', name=bus_name,
-                           rules=[{'name': 'APPLICATION_SUBMITTED',
-                                   'state': 'ENABLED',
-                                   'pattern': '{ "detail-type": ["APPLICATION_SUBMITTED"] }'
-                                   },
-                                  {'name': 'APPLICATION_APPROVED',
-                                   'state': 'ENABLED',
-                                   'pattern': '{ "detail-type": ["APPLICATION_APPROVED"] }'
-                                   }
-                                  ],
-                           targets=[{'rule': 'APPLICATION_APPROVED',
-                                    'arns': [bank_account_service.function_arn]}])
+        bus = events.EventBus(self, id, event_bus_name=bus_name)
+        events.Rule(self, "APPLICATION_SUBMITTED", event_bus=bus, event_pattern=events.EventPattern(
+            detail_type=["APPLICATION_SUBMITTED"]), rule_name="APPLICATION_SUBMITTED", enabled=True)
+        events.Rule(self, "APPLICATION_APPROVED", event_bus=bus, event_pattern=events.EventPattern(
+            detail_type=["APPLICATION_APPROVED"]), rule_name="APPLICATION_APPROVED", enabled=True,
+                         targets=[
+                             targets.LambdaFunction(lambda_.Function.from_function_arn(
+                                 self, "func", bank_account_service.function_arn))
+                         ])
 
-        self._event_bus_arn = bus.response
+        self._event_bus_arn = bus.event_bus_arn
 
     @property
     def event_bus_arn(self):

@@ -2,7 +2,7 @@
 set -x
 
 #ENDPOINT="$(serverless info --verbose | grep ServiceEndpoint | sed s/ServiceEndpoint\:\ //g)"
-ENDPOINT="https://k2h1yq9tr6.execute-api.us-east-1.amazonaws.com/prod/"
+ENDPOINT="https://2tbtvjged1.execute-api.ap-southeast-2.amazonaws.com/prod"
 
 # SUBMIT APPLICATION THAT PASSES CHECKS
 RES=$(echo '{"command": "SUBMIT_NEW_ACCOUNT_APPLICATION", "data": {"name":"Gabe"}}' | http POST "$ENDPOINT" -b)
